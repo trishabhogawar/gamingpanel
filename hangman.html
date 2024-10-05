@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman Game</title>
+    <style>
+        body 
+        {
+            font-family: 'Arimo', sans-serif;
+            background-color: #000000;
+            color: #7E688C;
+            margin: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .title 
+        {
+            font-family: 'Arimo', sans-serif;
+            font-size: 115px;
+            font-weight: bold;
+            color: transparent;
+            -webkit-text-stroke: 2px #a843ab;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 40px;
+            margin-top: 0.1px;
+        }
+
+        .main-content 
+        {
+            display: flex;
+            width: 70%;
+            align-items: flex-start;
+            margin-top: 70px
+        }
+
+        .hangman-section 
+        {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        #hangman-image
+        {
+            max-width: 200px;
+            margin-bottom: 10px;
+        }
+
+        .guesses-left 
+        {
+            font-size: 24px;
+            color: #FFF;
+            margin-top: 10px;
+            margin-bottom: 40px;
+        }
+
+        .game-section 
+        {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .word 
+        {
+            font-size: 48px;
+            margin-bottom: 30px;
+            letter-spacing: 10px;
+            color: #FFF;
+        }
+
+        .letters 
+        {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .letter 
+        {
+            display: inline-block;
+            margin: 7px;
+            padding: 20px;
+            font-size: 32px;
+            background-color: #6E5773;
+            border: none;
+            border-radius: 15px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .letter:hover 
+        {
+            background-color: #9077B6;
+        }
+
+        .letter:disabled 
+        {
+            background-color: #504658;
+            cursor: not-allowed;
+        }
+
+        .back-button 
+        {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            background-color: #7D3C98;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover 
+        {
+            background-color: #9E7DB1;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="title">Hangman Game</div>
+    <div class="main-content">
+        <div class="hangman-section">
+            <img id="hangman-image" src="hangman_images/0.jpg" alt="Hangman - No Wrong Guesses">
+            <div class="guesses-left" id="guesses-left">Guesses Left: 5</div>
+        </div>
+        <div class="game-section">
+            <div class="word" id="word-container"></div>
+            <div class="letters" id="letters"></div>
+        </div>
+    </div>
+    <a href="gamingpanel.html" class="back-button">Back</a>
+
+    <script>
+       
+        var words = ["hangman", "javascript", "programming", "html", "css", "python", "computer"];
+        var word = words[Math.floor(Math.random() * words.length)];
+        var guessedWord = "_".repeat(word.length);
+        var guessesLeft = 5;
+        
+        function updateDisplay() 
+        {
+            document.getElementById('word-container').textContent = guessedWord.split('').join(' ');
+            document.getElementById('guesses-left').textContent = 'Guesses Left: ' + guessesLeft;
+
+            var lettersDiv = document.getElementById('letters');
+            lettersDiv.innerHTML = '';
+            for (var i = 0; i < 26; i++) 
+            {
+                var letter = String.fromCharCode(97 + i);
+                var button = document.createElement('button');
+                button.textContent = letter.toUpperCase();
+                button.className = 'letter';
+                button.onclick = handleGuess;
+                lettersDiv.appendChild(button);
+            }
+        }
+
+        function handleGuess(event) 
+        {
+            var clickedLetter = event.target.textContent.toLowerCase();
+            event.target.disabled = true;
+            if (word.includes(clickedLetter)) 
+            {
+                guessedWord = guessedWord.split('').map((char, index) => 
+                {
+                    return word[index] === clickedLetter ? clickedLetter : char;
+                }).join('');
+                
+                if (guessedWord === word) 
+                {
+                    alert('Congratulations! You guessed the word: ' + word);
+                    resetGame();
+                }
+            } 
+            else 
+            {
+                guessesLeft--;
+                document.getElementById('hangman-image').src = 'hangman_images/' + (5 - guessesLeft) + '.jpg';
+                if (guessesLeft <= 0) 
+                {
+                    alert('Game over! The word was: ' + word);
+                    resetGame();
+                }
+            }
+            updateDisplay();
+        }
+
+        function resetGame() 
+        {
+            word = words[Math.floor(Math.random() * words.length)];
+            guessedWord = "_".repeat(word.length);
+            guessesLeft = 5;
+            document.getElementById('hangman-image').src = 'hangman_images/0.jpg';
+            updateDisplay();
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
